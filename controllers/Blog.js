@@ -85,5 +85,72 @@ const Update= async (req, res) => {
        return res.status(500).json({success:false , message: "Internal server error"}) 
     }
 }
+// get single post
 
-export {Create , DeletePost , GetPosts , Update}
+// const GetSinglePost = async (req, res) => {
+//   try {
+//     const post = await PostModel.findById(req.params.id);
+
+//     if (!post) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Post not Found",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       post,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Internal server error",
+//     });
+//   }
+// };
+// get single post with views count
+
+// get single post with views count
+
+const GetSinglePost = async (req, res) => {
+  try {
+
+    const post = await PostModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        $inc: {
+          views: 1
+        }
+      },
+      {
+        new: true
+      }
+    );
+
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not Found",
+      });
+    }
+
+
+    return res.status(200).json({
+      success: true,
+      post,
+    });
+
+
+  } catch (error) {
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+
+  }
+};
+
+export {Create , DeletePost , GetPosts , Update , GetSinglePost}

@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import DBCon from "./utlis/db.js";
 import AuthRoutes from "./routes/Auth.js";
 import cookieParser from "cookie-parser";
@@ -13,10 +14,17 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cookieParser())
-app.use(express.static('public'))
 // Middleware
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
+
+app.use(cookieParser());
 app.use(express.json());
+app.use(express.static("public"));
 
 // MongoDB Connect
 DBCon();
@@ -25,12 +33,12 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.use("/auth",AuthRoutes)
-app.use('/blog',BlogsRoutes)
-app.use('/dashboard' , DashboardRoutes)
-app.use('/comment' , CommentsRoutes)
-app.use('/public' , PublicRoutes)
+app.use("/auth", AuthRoutes);
+app.use("/blog", BlogsRoutes);
+app.use("/dashboard", DashboardRoutes);
+app.use("/comment", CommentsRoutes);
+app.use("/public", PublicRoutes);
 
 app.listen(port, () => {
-  console.log(` Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });

@@ -1,29 +1,64 @@
 import mongoose from "mongoose";
 
+const UserSchema = new mongoose.Schema(
+  {
+    FullName: {
+      type: String,
+      required: true,
+    },
 
-const UserSchema= new mongoose.Schema({
-    fullName:{
-        type:String,
+    email: {
+      type: String,
+      required: true,
+      unique: true,
     },
-    email:{
-        type:String,
-    },
-    profile:{
-        type:String,
-    },
-    password:{
-        type:String,
-    },
-    role:{
-        type:String,
-        enum:["admin" , "user"],
-        default:"user"
-    },
-    
-    
-},{timestamps:true})
 
+    imagePath: {
+      type: String,
+      default: "",
+    },
+     phone: {
+      type: String,
+      default: "",
+    },
 
-const UserModel= mongoose.model("Users",UserSchema)
+    location: {
+      type: String,
+      default: "",
+    },
 
-export default UserModel
+    about: {
+      type: String,
+      default: "",
+    },
+
+    password: {
+      type: String,
+      required: true,
+    },
+
+    role: {
+      type: String,
+      enum: ["admin", "user"],
+      default: "user",
+    },
+
+    // Forgot Password
+    resetPasswordToken: {
+      type: String,
+      default: null,
+    },
+
+    resetPasswordExpire: {
+      type: Date,
+      default: null,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const UserModel = mongoose.model("Users", UserSchema);
+
+export default UserModel;

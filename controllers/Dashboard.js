@@ -1,67 +1,161 @@
-import PostModel from "../models/Blog.js"
-import UserModel from "../models/user.js"
-import fs from 'fs'
+import PostModel from "../models/Blog.js";
+import UserModel from "../models/user.js";
+import CommentModel from "../models/comments.js";
+import fs from "fs";
 import path from "path";
 
 
 
 
-const GetallData= async(req ,res) => {
-    try{
-        const Users = await UserModel.find()
-        const Posts= await PostModel.find()
+const GetallData = async (req, res) => {
+  try {
 
-        // comment wiil be get here
-        if(!Users && !Posts){
-            return res.status(404).json({success:false , message: "Not Data Found"})
-        }
-        return res.status(500).json({success:true , Users , Posts})
-    }catch(error){
-        return res.status(500).json({success:false , message: "Internal server error"}) 
+    const Users = await UserModel.find().select("-password");
+
+    const Posts = await PostModel.find();
+
+    const Comments = await CommentModel.find();
+
+
+
+    return res.status(200).json({
+      success: true,
+
+      totalUsers: Users.length,
+
+      totalPosts: Posts.length,
+
+      totalComments: Comments.length,
+
+
+      Users,
+      Posts,
+      Comments,
+
+    });
+
+
+  } catch (error) {
+
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+
+  }
+};
+
+
+
+
+
+const GetUser = async (req, res) => {
+  try {
+
+    const Users = await UserModel.find().select("-password");
+
+
+    return res.status(200).json({
+      success: true,
+      totalUsers: Users.length,
+      Users,
+    });
+
+
+  } catch (error) {
+
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+
+  }
+};
+
+
+
+
+
+const UserDelete = async (req, res) => {
+  try {
+
+    const userId = req.params.id;
+
+
+    const ExistUser = await UserModel.findById(userId);
+
+
+    if (!ExistUser) {
+
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+
     }
-}
 
-const GetUser = async(req , res) => {
-   try{
-        const Users = await UserModel.find()
-        
 
-        
-        if(!Users){
-            return res.status(404).json({success:false , message: "Not Data Found"})
-        }
-        return res.status(500).json({success:true , Users})
-    }catch(error){
-        return res.status(500).json({success:false , message: "Internal server error"}) 
+
+    if (ExistUser.role === "admin") {
+
+      return res.status(403).json({
+        success: false,
+        message: "Sorry! Admin account can't be deleted.",
+      });
+
     }
-}
 
-// delete
 
-const UserDelete = async(req , res) => {
-   try{
-        const userId = req.params.id
-        const ExistUser=await UserModel.findById(userId)
-        
 
-        
-        if(!ExistUser){
-            return res.status(404).json({success:false , message: "Not Data Found"})
-        }
-        if(ExistUser.role == "admin"){
-            return res.status(404).json({success:false, message: "Soory your Admin you can't Delete you Account"})
-        }
-        if(ExistUser.profile){
-                    const profilePath= path.join('public/images', ExistUser.profile)
-                    fs.promises.unlink(profilePath)
-                    .then(()=> console.log("post image deleted"))
-                    .catch(error => console.log("error deleting post image"))
-                }
+    if (ExistUser.imagePath) {
 
-        const deleteUsers= await UserModel.findByIdAndDelete(userId)
-        return res.status(500).json({success:true ,message: "User Deleted Successfully",user:deleteUsers})
-    }catch(error){
-        return res.status(500).json({success:false , message: "Internal server error"}) 
+      const imagePath = path.join(
+        "public",
+        "images",
+        ExistUser.imagePath
+      );
+
+
+      if (fs.existsSync(imagePath)) {
+
+        await fs.promises.unlink(imagePath);
+
+      }
+
     }
-}
-export {GetallData , GetUser , UserDelete}
+
+
+
+    await UserModel.findByIdAndDelete(userId);
+
+
+    return res.status(200).json({
+      success:true,
+      message:"User deleted successfully",
+    });
+
+
+
+  } catch (error) {
+
+    console.log(error);
+
+    return res.status(500).json({
+      success:false,
+      message:"Internal server error",
+    });
+
+  }
+};
+
+
+
+export {
+  GetallData,
+  GetUser,
+  UserDelete
+};

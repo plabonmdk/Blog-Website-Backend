@@ -1,10 +1,11 @@
 import express from 'express'
-import { GetSinePost } from '../controllers/public.js'
+import { GetMe, GetSinePost } from '../controllers/public.js'
 
 
 const PublicRoutes= express.Router()
 
 PublicRoutes.get('/singlePost/:id' , GetSinePost)
+PublicRoutes.get("/me", GetMe);
 
 
 export default PublicRoutes
