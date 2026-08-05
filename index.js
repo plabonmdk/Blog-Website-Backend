@@ -38,7 +38,4 @@ app.use("/blog", BlogsRoutes);
 app.use("/dashboard", DashboardRoutes);
 app.use("/comment", CommentsRoutes);
 app.use("/public", PublicRoutes);
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+export default app;
